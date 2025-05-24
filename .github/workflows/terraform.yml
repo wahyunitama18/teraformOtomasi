@@ -1,0 +1,27 @@
+name: Terraform CI/CD AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Plan
+      run: terraform plan -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY }}" -var "aws_secret_key=${{ secrets.AWS_SECRET_KEY }}"
+
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main'
+      run: terraform apply -auto-approve -var "aws_access_key=${{ secrets.AWS_ACCESS_KEY }}" -var "aws_secret_key=${{ secrets.AWS_SECRET_KEY }}"
